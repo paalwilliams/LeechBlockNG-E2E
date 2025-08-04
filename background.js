@@ -60,6 +60,8 @@ function initTab(id) {
 // Create (precompile) regular expressions
 //
 function createRegExps() {
+
+	
 	// Create new RegExp objects
 	for (let set = 1; set <= gNumSets; set++) {
 		gRegExps[set] = {};
@@ -651,75 +653,153 @@ function checkTab(id, isBeforeNav, isRepeat) {
 			// Apply block if all relevant block conditions are fulfilled
 			if (!override && doBlock && (!isRepeat || activeBlock)) {
 
-				function applyBlock(keyword) {
-					if (gDiagMode) {
-						log("### BLOCK APPLIED ###");
-						log(`id: ${id}`);
-						log(`isBeforeNav: ${isBeforeNav}`);
-						log(`isRepeat: ${isRepeat}`);
-						log(`timedate: ${timedate}`);
-						log(`set: ${set}`);
-						log(`pageURL: ${pageURL}`);
-						log(`referrer: ${referrer}`);
-						log(`lockdown: ${lockdown}`);
-						log(`withinTimePeriods: ${withinTimePeriods}`);
-						log(`afterTimeLimit: ${afterTimeLimit}`);
-						log(`blockURL: ${blockURL}`);
-						if (blockRE) {
-							let res = blockRE.exec(pageURL);
-							if (res) {
-								log(`blockRE.exec: ${res[0]}`);
-							}
-						}
-						if (referRE) {
-							let res = referRE.exec(referrer);
-							if (res) {
-								log(`referRE.exec: ${res[0]}`);
-							}
-						}
-						if (keyword) {
-							log(`keyword: ${keyword}`);
-						}
+				class AdguardHomeClient{
+					/**
+					 * 
+					 * @param {{
+					 * username: string,
+					 * password: string,
+					 * baseUrl: string,
+					 * port: string
+					 * }} options 
+					*/
+					constructor({username, password, baseUrl, port}) {
+
+						this.username = username;
+						this.password = password;
+						this.baseUrl = baseUrl
+						this.port = port
+						const token = window.btoa(`${this.username}:${this.password}`)
+						this.headers = new Headers({
+							"Content-type": "application/json",
+							"Authorization": `Basic ${token}`
+						});
 					}
-					if (closeTab) {
-						// Close tab
-						browser.tabs.remove(id);
-					} else if (applyFilter) {
-						gTabs[id].filterSet = set;
 
-						// Mute tab if option selected
-						if (filterMute) {
-							browser.tabs.update(id, { "muted": true });
-						}
+					/**
+					 * @param {string} path
+					 * @param {RequestInit} options
+					 */
+					async makeRequest(path, options) {
+						const url = `${this.baseUrl}:${this.port}/control${path}`
+						return fetch(url, {...options, headers: this.headers})
+					}
 
-						// Send message to tab
-						let message = {
-							type: "filter",
-							name: filterName
-						};
-						browser.tabs.sendMessage(id, message).catch(
-							function (error) {}
-						);
-					} else {
-						gTabs[id].keyword = keyword;
+					async getFilteringStatus () {
+						return this.makeRequest("/filtering/status")
+					}
 
-						if (browser.history && addHistory && !isInternalPage) {
-							// Add blocked page to browser history
-							browser.history.addUrl({ url: pageURLWithHash });
-						}
-
-						// Get final URL for block page
-						blockURL = getLocalizedURL(blockURL)
-								.replace(/\$K/g, keyword ? keyword : "")
-								.replace(/\$S/g, set)
-								.replace(/\$U/g, pageURLWithHash);
-
-						// Redirect page
-						browser.tabs.update(id, { url: blockURL });
+					/**
+					 * 
+					 * @param {string[]} rules 
+					 */
+					async setRules(rules) {
+						return this.makeRequest("/filtering/set_rules", {method: 'POST', body: JSON.stringify({rules})})
 					}
 				}
 
-				if (keywordRE && !isInternalPage) {
+				
+
+				function applyBlock(keyword) {
+
+					const {adguardHomeUsername, adguardHomePassword, adguardHomeBaseUrl, adguardHomePort} = gOptions;
+
+					const client = new AdguardHomeClient({
+						username: adguardHomeUsername,
+						password: adguardHomePassword,
+						baseUrl: adguardHomeBaseUrl,
+						port: adguardHomePort
+					})
+
+
+					client.getFilteringStatus().catch(console.error).then((response) => response.json()).then((data) => {
+
+						// Get Existing Rules
+						const existingUserRules = data.user_rules || [];
+
+						const sites = gOptions[`sites${set}`].split(" ");
+
+						const applySiteBlockPattern = (site) => `||${site}^`
+
+						const sitesWithblockPattern = sites.map(applySiteBlockPattern);
+
+
+						const newRules = [...sitesWithblockPattern,]
+
+						const filteredRules = existingUserRules.filter((r) => !newRules.includes(r));
+						const rules = [...filteredRules, ...newRules]
+						client.setRules(rules).then(console.log)
+					}).catch(console.error).then(() => {
+
+						if (gDiagMode) {
+							log("### BLOCK APPLIED ###");
+							log(`id: ${id}`);
+							log(`isBeforeNav: ${isBeforeNav}`);
+							log(`isRepeat: ${isRepeat}`);
+							log(`timedate: ${timedate}`);
+							log(`set: ${set}`);
+							log(`pageURL: ${pageURL}`);
+							log(`referrer: ${referrer}`);
+							log(`lockdown: ${lockdown}`);
+							log(`withinTimePeriods: ${withinTimePeriods}`);
+							log(`afterTimeLimit: ${afterTimeLimit}`);
+							log(`blockURL: ${blockURL}`);
+							if (blockRE) {
+								let res = blockRE.exec(pageURL);
+								if (res) {
+									log(`blockRE.exec: ${res[0]}`);
+								}
+							}
+							if (referRE) {
+								let res = referRE.exec(referrer);
+								if (res) {
+									log(`referRE.exec: ${res[0]}`);
+								}
+							}
+							if (keyword) {
+								log(`keyword: ${keyword}`);
+							}
+						}
+						if (closeTab) {
+							// Close tab
+							browser.tabs.remove(id);
+						} else if (applyFilter) {
+							gTabs[id].filterSet = set;
+							
+							// Mute tab if option selected
+							if (filterMute) {
+								browser.tabs.update(id, { "muted": true });
+							}
+							
+							// Send message to tab
+							let message = {
+								type: "filter",
+								name: filterName
+							};
+							browser.tabs.sendMessage(id, message).catch(
+								function (error) {}
+							);
+						} else {
+							gTabs[id].keyword = keyword;
+							
+							if (browser.history && addHistory && !isInternalPage) {
+								// Add blocked page to browser history
+								browser.history.addUrl({ url: pageURLWithHash });
+							}
+							
+							// Get final URL for block page
+							blockURL = getLocalizedURL(blockURL)
+							.replace(/\$K/g, keyword ? keyword : "")
+							.replace(/\$S/g, set)
+							.replace(/\$U/g, pageURLWithHash);
+							
+							// Redirect page
+							browser.tabs.update(id, { url: blockURL });
+						}
+					})
+					}
+					
+					if (keywordRE && !isInternalPage) {
 					// Check for keyword(s) before blocking
 					let message = {
 						type: "keyword",
@@ -1128,6 +1208,7 @@ function createBlockInfo(id, url) {
 
 	// Get reloading time (if specified)
 	let reloadSecs = gOptions[`reloadSecs${blockedSet}`];
+	
 
 	return {
 		theme: theme,
@@ -1640,9 +1721,12 @@ function handleMessage(message, sender, sendResponse) {
 		return;
 	}
 
-	//log("handleMessage: " + sender.tab.id + " " + message.type);
+	log(gTabs)
+
+	log("handleMessage: " + sender.tab.id + " " + message.type);
 
 	switch (message.type) {
+
 
 		case "add-sites":
 			// Add sites to block set

@@ -4,3 +4,4 @@
 *.xpi
 
 jquery-ui/**
+.DS_Store
