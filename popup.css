@@ -1,0 +1,50 @@
+/* LeechBlock popup style */
+
+@media (prefers-color-scheme: light) {
+
+	body {
+		background-color: #fff;
+	}
+
+}
+
+@media (prefers-color-scheme: dark) {
+
+	body {
+		background-color: #222;
+	}
+
+}
+
+body {
+	color: #000;
+	font-size: 14px;
+	text-align: center;
+}
+
+#button-container {
+	display: inline-block;
+	width: 180px;
+}
+
+button {
+	display: inline;
+	width: 100%;
+	margin: 2px;
+	padding: 2px;
+	background: #eee;
+	border: 1px solid #888;
+	border-radius: 6px;
+}
+
+button:hover:enabled {
+	background: #ddd;
+}
+
+button:active:enabled {
+	background: #ccc;
+}
+
+.logo {
+	width: 204px;
+}

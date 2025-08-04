@@ -1,0 +1,96 @@
+/* LeechBlock blocking/delaying page style */
+
+@media (prefers-color-scheme: light) {
+
+	body {
+		background: #fff;
+	}
+
+}
+
+@media (prefers-color-scheme: dark) {
+
+	body {
+		background: #222;
+	}
+
+}
+
+body {
+	color: #2e3436;
+	font: normal 16px "Open Sans", Arial, sans-serif;
+	text-align: center;
+}
+
+div {
+	margin-top: 40px;
+}
+
+h1 {
+    font-size: 24px;
+    font-weight: 300;
+}
+
+a {
+    color: #2ca089;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+blockquote {
+	font-weight: bold;
+}
+
+input, button {
+	color: #333;
+	font: normal 16px "Open Sans", Arial, sans-serif;
+	padding: 2px 8px;
+	border: 1px solid #888;
+	border-radius: 6px;
+}
+
+button {
+	background: #eee;
+}
+
+button:hover:enabled {
+	background: #ddd;
+}
+
+button:active:enabled {
+	background: #ccc;
+}
+
+.logo {
+	width: 408px;
+}
+
+.keyword {
+	font-weight: bold;
+}
+
+.time {
+	font-weight: bold;
+}
+
+.delay {
+	font-weight: bold;
+}
+
+.error {
+	background: #f00;
+}
+
+.support {
+	color: #777;
+	font-size: 14px;
+	font-style: italic;
+}
+
+.support a {
+	color: #777;
+	text-decoration: underline;
+}

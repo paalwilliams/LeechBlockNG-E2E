@@ -1,0 +1,155 @@
+/* LeechBlock options style */
+
+html {
+	overflow-y: scroll;
+}
+
+@media (prefers-color-scheme: light) {
+
+	body {
+		background: #fff;
+	}
+
+}
+
+@media (prefers-color-scheme: dark) {
+
+	body {
+		background: #222;
+	}
+
+}
+
+body {
+	color: #000;
+	font-size: 14px;
+}
+
+.ui-button {
+	background: #eee;
+	color: #333;
+	border: 1px solid #888;
+}
+
+.ui-button:focus {
+	background: #eee;
+	border: 1px solid #888;
+}
+
+.ui-button:hover {
+	background: #ddd;
+	border: 1px solid #888;
+}
+
+.ui-widget button {
+	padding: 2px 8px;
+	background: #eee;
+	color: #333;
+	border: 1px solid #888;
+	border-radius: 3px;
+}
+
+.ui-widget button:hover:enabled {
+	background: #ddd;
+}
+
+.ui-widget button:active:enabled {
+	background: #ccc;
+}
+
+.ui-widget button:disabled {
+	background: #eee;
+	color: #666;
+	border: 1px solid #ccc;
+}
+
+.ui-widget fieldset, .ui-widget input, .ui-widget select, .ui-widget textarea {
+	background: #fff;
+	color: #000;
+	border: 1px solid #888;
+}
+
+.ui-widget input:disabled, .ui-widget select:disabled, .ui-widget textarea:disabled {
+	background: #eee;
+	color: #666;
+	border: 1px solid #ccc;
+}
+
+.ui-widget hr {
+	height: 0px;
+	margin: 0px;
+	border-top: none;
+	border-left: none;
+	border-right: none;
+	border-bottom: 1px solid #888;
+}
+
+.ui-widget legend {
+	font-weight: bold;
+}
+
+.ui-widget a {
+    color: #2ca089;
+    text-decoration: none;
+}
+
+.ui-widget a:hover {
+    text-decoration: underline;
+}
+
+.ui-widget th, .ui-widget td {
+	text-align: center;
+	padding: 4px 12px;
+}
+
+.ui-widget code {
+	font: normal 14px monospace;
+}
+
+.logo {
+	width: 408px;
+}
+
+#form-container {
+	display: flex;
+	justify-content: center;
+}
+
+#form {
+  text-align: center;
+}
+
+#tabs {
+	display: inline-block;
+	text-align: left;
+}
+
+#paneAbout {
+	color: #2e3436;
+	text-align: center;
+	line-height: 1.5em;
+}
+
+#promptAccessCodeText {
+	font: normal 14px monospace;
+	user-select: none;
+	-moz-user-select: none;
+}
+
+#promptAccessCodeCanvas {
+	background: #fff;
+}
+
+#promptAccessCodeInput {
+	font: normal 14px monospace;
+}
+
+#clockOffsetTime {
+	background: #def;
+	border: 1px solid #888;
+	padding: 2px 4px;
+}
+
+#results {
+	font: normal 12px monospace;
+}
