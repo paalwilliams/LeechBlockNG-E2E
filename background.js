@@ -702,7 +702,7 @@ function checkTab(id, isBeforeNav, isRepeat) {
 
 				function applyBlock(keyword) {
 
-					const {adguardHomeUsername, adguardHomePassword, adguardHomeBaseUrl, adguardHomePort} = gOptions;
+					const { adguardHomeUsername, adguardHomePassword, adguardHomeBaseUrl, adguardHomePort } = gOptions;
 
 					const client = new AdguardHomeClient({
 						username: adguardHomeUsername,
@@ -712,7 +712,7 @@ function checkTab(id, isBeforeNav, isRepeat) {
 					})
 
 
-					client.getFilteringStatus().catch(console.error).then((response) => response.json()).then((data) => {
+					client.getFilteringStatus().then((response) => response.json()).then((data) => {
 
 						// Get Existing Rules
 						const existingUserRules = data.user_rules || [];
@@ -729,7 +729,9 @@ function checkTab(id, isBeforeNav, isRepeat) {
 						const filteredRules = existingUserRules.filter((r) => !newRules.includes(r));
 						const rules = [...filteredRules, ...newRules]
 						client.setRules(rules).then(console.log)
-					}).catch(console.error).then(() => {
+					})
+
+						.then(() => {
 
 						if (gDiagMode) {
 							log("### BLOCK APPLIED ###");
