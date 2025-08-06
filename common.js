@@ -81,6 +81,7 @@ const PER_SET_OPTIONS = {
 
 const GENERAL_OPTIONS = {
 	// def: default value, id: form element identifier (see options.html)
+	adguardHomeEnabled: {type: "boolean", def: false, id: "adguardHomeEnabled"},
 	adguardHomeUsername: {type: "string", def: "", id: "adguardHomeUsername"},
 	adguardHomePassword: {type: "string", def: "3000", id: "adguardHomePassword"},
 	adguardHomeBaseUrl: {type: "string", def: "", id: "adguardHomeBaseUrl"},

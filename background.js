@@ -696,42 +696,67 @@ function checkTab(id, isBeforeNav, isRepeat) {
 					async setRules(rules) {
 						return this.makeRequest("/filtering/set_rules", {method: 'POST', body: JSON.stringify({rules})})
 					}
+
+
+					/** 
+					* @param {string} userRules
+					* @returns {string} 
+					*/
+					applySiteBlockPattern(url) {
+						 return `||${url}^`
+					}
+
+
+
+					/** 
+					* @param {string[]} userRules
+					* @returns {string[]} 
+					*/
+					formatRequestBody(userRules) {
+						const existingUserRules = userRules || [];
+
+						const sites = gOptions[`sites${set}`].split(" ");
+
+
+						const sitesWithblockPattern = sites.map(this.applySiteBlockPattern.bind(this));
+
+						const newRules = [...sitesWithblockPattern,]
+
+						const filteredRules = existingUserRules.filter((r) => !newRules.includes(r));
+						const rules = [...filteredRules, ...newRules]
+						return rules
+
+					}
+
+
+
 				}
 
 				
 
 				function applyBlock(keyword) {
 
-					const { adguardHomeUsername, adguardHomePassword, adguardHomeBaseUrl, adguardHomePort } = gOptions;
-
-					const client = new AdguardHomeClient({
-						username: adguardHomeUsername,
-						password: adguardHomePassword,
-						baseUrl: adguardHomeBaseUrl,
-						port: adguardHomePort
-					})
+					const { adguardHomeUsername, adguardHomePassword, adguardHomeBaseUrl, adguardHomePort, adguardHomeEnabled} = gOptions;
 
 
-					client.getFilteringStatus().then((response) => response.json()).then((data) => {
+					if(adguardHomeEnabled) {
 
-						// Get Existing Rules
-						const existingUserRules = data.user_rules || [];
-
-						const sites = gOptions[`sites${set}`].split(" ");
-
-						const applySiteBlockPattern = (site) => `||${site}^`
-
-						const sitesWithblockPattern = sites.map(applySiteBlockPattern);
+						const client = new AdguardHomeClient({
+							username: adguardHomeUsername,
+							password: adguardHomePassword,
+							baseUrl: adguardHomeBaseUrl,
+							port: adguardHomePort
+						})
 
 
-						const newRules = [...sitesWithblockPattern,]
+						client.getFilteringStatus().then((response) => response.json()).then((data) => {
+							// Apply Existing Rules
+							const existingUserRules = data.user_rules || [];
+							const formattedRequestBody = client.formatRequestBody(existingUserRules)
+							return client.setRules(formattedRequestBody)
+						})
+					}
 
-						const filteredRules = existingUserRules.filter((r) => !newRules.includes(r));
-						const rules = [...filteredRules, ...newRules]
-						client.setRules(rules).then(console.log)
-					})
-
-						.then(() => {
 
 						if (gDiagMode) {
 							log("### BLOCK APPLIED ###");
@@ -798,7 +823,6 @@ function checkTab(id, isBeforeNav, isRepeat) {
 							// Redirect page
 							browser.tabs.update(id, { url: blockURL });
 						}
-					})
 					}
 					
 					if (keywordRE && !isInternalPage) {

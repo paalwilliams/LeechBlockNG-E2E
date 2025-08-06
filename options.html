@@ -378,20 +378,24 @@
 						<fieldset>
 							<legend>Adguard Home Settings</legend>
 							<p>
+								Enable Adguard Home:
+								<input id="adguardHomeEnabled" type="checkbox" size="12">
+							</p>
+							<p>
 								Adguard Home Username:
-								<input id="adguardHomeUsername" type="text" size="12" title="Default: 6">
+								<input id="adguardHomeUsername" type="text" size="12">
 							</p>
 							<p>
 								Adguard Home Password:
-								<input id="adguardHomePassword" type="password" size="12" title="Default: 6">
+								<input id="adguardHomePassword" type="password" size="12">
 							</p>
 							<p>
 								Adguard Home BaseURL:
-								<input id="adguardHomeBaseUrl" type="text" size="12" title="Default: 6">
+								<input id="adguardHomeBaseUrl" pattern="https?://.+" type="text" size="25">
 							</p>
 							<p>
 								Adguard Home Port:
-								<input id="adguardHomePort" type="text" size="12" title="Default: 6">
+								<input id="adguardHomePort" type="text" size="8">
 							</p>
 						</fieldset>
 						<fieldset>
