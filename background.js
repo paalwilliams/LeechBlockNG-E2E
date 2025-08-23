@@ -653,6 +653,86 @@ function checkTab(id, isBeforeNav, isRepeat) {
 			// Apply block if all relevant block conditions are fulfilled
 			if (!override && doBlock && (!isRepeat || activeBlock)) {
 
+				class HomeAssistantClient {
+
+					/**
+					 * @param {{
+					 * token: string,
+					 * baseUrl: string,
+					 * port: string
+					 * }} options 
+					*/
+					constructor({token, baseUrl, port}) {
+
+						this.token = token;
+						this.baseUrl = baseUrl
+						this.port = port
+
+						this.headers = new Headers({
+							"Content-type": "application/json",
+							"Authorization": `Bearer ${this.token}`
+						});
+					}
+
+					/**
+					 * @param {string} path
+					 * @param {RequestInit} options
+					 */
+					async makeRequest(path, options) {
+						const url = `${this.baseUrl}:${this.port}/api${path}`
+						return fetch(url, {...options, headers: this.headers})
+					}
+
+					/**
+					 * 
+					 * @param {string} timestamp 
+					 */
+					formatTimestamp(timestamp) {
+						const d = new Date(timestamp)
+						const pad = n => String(n).padStart(2, '0');
+						return (
+							d.getFullYear() +
+							'-' + pad(d.getMonth() + 1) +
+							'-' + pad(d.getDate()) +
+							' ' + pad(d.getHours()) +
+							':' + pad(d.getMinutes()) +
+							':' + pad(d.getSeconds())
+						);
+					}
+
+					/**
+					 * @param {string} entityId 
+					 * @param {string} timestamp
+					 * @param {string[]} value
+					 */
+					async setStateValue(entityId, value, timestamp) {
+
+						const dateTime = this.formatTimestamp(timestamp)
+
+						const d = new Date(timestamp)
+
+						return this.makeRequest(`/states/${entityId}`, {method: 'POST', body: JSON.stringify({
+								state: dateTime,
+								attributes: {
+									year: d.getFullYear(),
+									month: d.getMonth() + 1,
+									day: d.getDate(),
+									hour: d.getHours(),
+									minute: d.getMinutes(),
+									second: d.getSeconds(),
+									editable: true,
+									has_time: true,
+									has_date: true,
+									friendly_name: `Blocklist ${set}`,
+									rules: JSON.stringify(value)
+								}
+						})
+							
+					}
+				)}
+
+				}
+
 				class AdguardHomeClient{
 					/**
 					 * 
@@ -696,8 +776,7 @@ function checkTab(id, isBeforeNav, isRepeat) {
 					async setRules(rules) {
 						return this.makeRequest("/filtering/set_rules", {method: 'POST', body: JSON.stringify({rules})})
 					}
-
-
+					
 					/** 
 					* @param {string} userRules
 					* @returns {string} 
@@ -705,8 +784,6 @@ function checkTab(id, isBeforeNav, isRepeat) {
 					applySiteBlockPattern(url) {
 						 return `||${url}^`
 					}
-
-
 
 					/** 
 					* @param {string[]} userRules
@@ -717,7 +794,6 @@ function checkTab(id, isBeforeNav, isRepeat) {
 
 						const sites = gOptions[`sites${set}`].split(" ");
 
-
 						const sitesWithblockPattern = sites.map(this.applySiteBlockPattern.bind(this));
 
 						const newRules = [...sitesWithblockPattern,]
@@ -727,34 +803,40 @@ function checkTab(id, isBeforeNav, isRepeat) {
 						return rules
 
 					}
-
-
-
 				}
-
-				
 
 				function applyBlock(keyword) {
 
-					const { adguardHomeUsername, adguardHomePassword, adguardHomeBaseUrl, adguardHomePort, adguardHomeEnabled} = gOptions;
+					const unblockTimeStamp = gOptions[`timedata${set}`].at(-1) * 1000
 
-
+					const { adguardHomeUsername, adguardHomePassword, adguardHomeBaseUrl, adguardHomePort, adguardHomeEnabled, homeAssistantBaseUrl, homeAssistantPort, homeAssistantToken} = gOptions;
 					if(adguardHomeEnabled) {
 
-						const client = new AdguardHomeClient({
+						const adguardClient = new AdguardHomeClient({
 							username: adguardHomeUsername,
 							password: adguardHomePassword,
 							baseUrl: adguardHomeBaseUrl,
 							port: adguardHomePort
 						})
 
+						const homeAssistantClient = new HomeAssistantClient({
+							baseUrl: homeAssistantBaseUrl,
+							port: homeAssistantPort,
+							token: homeAssistantToken
+						})
 
-						client.getFilteringStatus().then((response) => response.json()).then((data) => {
+
+						adguardClient.getFilteringStatus().then((response) => response.json()).then((data) => {
+
 							// Apply Existing Rules
 							const existingUserRules = data.user_rules || [];
-							const formattedRequestBody = client.formatRequestBody(existingUserRules)
-							return client.setRules(formattedRequestBody)
-						})
+							const formattedRequestBody = adguardClient.formatRequestBody(existingUserRules)
+							return adguardClient.setRules(formattedRequestBody)
+						}).catch(console.error)
+
+						const entityId = `input_datetime.blocklist_${set}`
+
+						homeAssistantClient.setStateValue(entityId, adguardClient.formatRequestBody([]), unblockTimeStamp).catch(console.error)
 					}
 
 
