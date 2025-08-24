@@ -20,17 +20,26 @@ This is designed around my use case (Adguard Home running as a home assistant ad
 
 In order to make this function, you will need to create a datetime (Note: It must be a datetime helper specifically) helper in home assistant for each blocklist you have. At this time, the id **_must_** match blocklist\_`<num>`. Names that will generate this in Home assistant are: Blocklist `<num>`.
 
-You will also need to create two automations.
+You will also need to create two shell commands.
 
-The first called `reset_filtering_rules.sh`
+The first, will run a command to reset the filtering rules. This should be run on Home Assistant boot.
+
+You will need to add a shell command in Home Assistant.
+
+`reset_filtering_rules.sh`
 
 ```shell
-curl --location 'https://localhost:3000/control/filtering/set_rules' --header 'Content-type: application/json' --header 'Authorization: Basic <adguard_home_token>' --data '{"rules":  [ "" ] }' -k
+curl --location 'https://<adguard_home_url>/control/filtering/set_rules' --header 'Content-type: application/json' --header 'Authorization: Basic <adguard_home_token>' --data '{"rules":  [ "" ] }' -k
 ```
 
-The `rules` list should be a list of rules that you would like permanently appled.
+The `rules` list should be a list of rules that you would like permanently appled. 
 
-The second, called `unset_filtering_rules.sh`
+Example: `["||something.com^"]`
+
+The second shell command is to unset the rules when the block expires. 
+
+
+`unset_filtering_rules.sh`
 
 ```bash
 #!/bin/bash
@@ -77,9 +86,11 @@ curl --location 'https://localhost:3000/control/filtering/set_rules' \
 
 ## Create Automation
 
+You'll need to create two automations. One to reset the blocklist when you reboot home assistant (in the currently implementation, the blocklists are storeed in the `attributes` state of the datetime helper. This resets between boots, so there might be a scenario where your rules don't expire in an expected way.
+
 You'll need to create an automation to reset the filtered_services list in Adguard Home once the block expires in Leechblock.
 
-Please note the vlueas in the `triggers[*].at` field. These are the entity IDs of the datetime helpers created earlier.
+Please note the values in the `triggers[*].at` field. These are the entity IDs of the datetime helpers created earlier.
 
 ```yaml
 alias: Unset Adguard Rules
