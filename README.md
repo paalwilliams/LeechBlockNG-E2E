@@ -16,7 +16,7 @@ The rule will send an HTTP request to your Adguard Home instance to block the do
 
 # Home Assistant Configuration
 
-This is designed around my use case (Adguard Home running as a home assistant add on, using Firefox based browser), so YMMV if you try with other.
+This is designed around my use case (Adguard Home running as a home assistant add on, using Firefox based browser). This would not be so difficult to apply to a chromium based browser.
 
 In order to make this function, you will need to create a datetime (Note: It must be a datetime helper specifically) helper in home assistant for each blocklist you have. At this time, the id **_must_** match blocklist\_`<num>`. Names that will generate this in Home assistant are: Blocklist `<num>`.
 
