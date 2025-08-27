@@ -154,7 +154,12 @@ actions:
         metadata: {}
         data:
           rules_to_unset: |
-            {{ state_attr('input_datetime.blocklist_1', 'rules') | to_json }}
+            {{ state_attr('input_datetime.blocklist_1', 'rules') }}
+      - action: persistent_notification.create
+        data:
+          message: >
+            Trigger ID: {{ trigger.id }} Triggered entity: {{ triggered_entity
+            }} Rules: {{ state_attr('input_datetime.blocklist_1', "rules") }}
   - if:
       - condition: trigger
         id:
@@ -164,7 +169,7 @@ actions:
         metadata: {}
         data:
           rules_to_unset: |
-            {{ state_attr('input_datetime.blocklist_2', 'rules') | to_json }}
+            {{ state_attr('input_datetime.blocklist_2', 'rules') }}
   - if:
       - condition: trigger
         id:
@@ -174,7 +179,7 @@ actions:
         metadata: {}
         data:
           rules_to_unset: |
-            {{ state_attr('input_datetime.blocklist_3', 'rules') | to_json }}
+            {{ state_attr('input_datetime.blocklist_3', 'rules') }}
   - if:
       - condition: trigger
         id:
@@ -184,7 +189,7 @@ actions:
         metadata: {}
         data:
           rules_to_unset: |
-            {{ state_attr('input_datetime.blocklist_4', 'rules') | to_json }}
+            {{ state_attr('input_datetime.blocklist_4', 'rules') }}
 mode: single
 ```
 
