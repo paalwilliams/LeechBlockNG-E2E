@@ -32,6 +32,7 @@ You will need to add a shell command in Home Assistant.
 `reset_filtering_rules.sh`
 
 ```shell
+#!/bin/bash
 curl --location 'https://<adguard_home_url>/control/filtering/set_rules' --header 'Content-type: application/json' --header 'Authorization: Basic <adguard_home_token>' --data '{"rules":  [ "" ] }'
 ```
 
