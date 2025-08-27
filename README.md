@@ -2,7 +2,9 @@
 
 Now E2E!
 
-This fork sends a request to add the websites on the activated block list to the filterered websites on an Adguard Home Instance, enabling a DNS level block in connection with the browser level block
+This fork sends a request to add the websites on the activated block list to the filterered websites on an Adguard Home Instance running on Home Assistant, enabling a DNS level block in connection with the browser level block.
+
+This will also schedule the site list to be unblocked in the Home Assistant instance at the correct time.
 
 # Leechblock Configuration
 
@@ -16,25 +18,30 @@ The rule will send an HTTP request to your Adguard Home instance to block the do
 
 # Home Assistant Configuration
 
-This is designed around my use case (Adguard Home running as a home assistant add on, using Firefox based browser). This would not be so difficult to apply to a chromium based browser.
+This is designed around my use case (Adguard Home running as a Home Assistant add on, using a Firefox based browser). This shouldn't be too difficult to adapt to the leechblock chrome repository, if desired. Please create an issue if you have questions.
 
-In order to make this function, you will need to create a datetime (Note: It must be a datetime helper specifically) helper in home assistant for each blocklist you have. At this time, the id **_must_** match blocklist\_`<num>`. Names that will generate this in Home assistant are: Blocklist `<num>`.
+In order to make this function, you will need to create a datetime (Note: It must be a datetime helper specifically) helper in home assistant for each blocklist you have. At this time, the id **_must_** match blocklist_`<num>`. This can be achieved by creating the helper with the name of `Blocklist <num>` (Home Assistant will create the ID as `blocklist_<num>`.
 
 You will also need to create two shell commands.
 
-The first, will run a command to reset the filtering rules. This should be run on Home Assistant boot.
+The first, will run a command to reset the filtering rules. This should be run on Home Assistant boot. 
+
 
 You will need to add a shell command in Home Assistant.
 
 `reset_filtering_rules.sh`
 
 ```shell
-curl --location 'https://<adguard_home_url>/control/filtering/set_rules' --header 'Content-type: application/json' --header 'Authorization: Basic <adguard_home_token>' --data '{"rules":  [ "" ] }' -k
+curl --location 'https://<adguard_home_url>/control/filtering/set_rules' --header 'Content-type: application/json' --header 'Authorization: Basic <adguard_home_token>' --data '{"rules":  [ "" ] }'
 ```
 
-The `rules` list should be a list of rules that you would like permanently appled. 
+The `rules` list should be a list of rules that you would like permanently applied. 
 
 Example: `["||something.com^"]`
+
+This is necessary, because the `state` attributes that are set on the helper (to expire the block) do not persist between reboots. It's possible to end up in a scenario where rules are blocked in Adguard, but there is no job scheduled to expire the block. 
+
+---
 
 The second shell command is to unset the rules when the block expires. 
 
