@@ -40,7 +40,7 @@ The `rules` list should be a list of rules that you would like permanently appli
 
 Example: `["||something.com^"]`
 
-This is necessary, because the `state` attributes that are set on the helper (to expire the block) do not persist between reboots. It's possible to end up in a scenario where rules are blocked in Adguard, but there is no job scheduled to expire the block. 
+This is necessary, because the `state` attributes that are set on the helper (to expire the block) do not persist between reboots. It's possible to end up in a scenario where rules are blocked in Adguard, but there is no job scheduled to expire the block. The simple fix is just to rewrite the list with only the permanently allowed rules, and the browser extension, when a block is encounted in the browser, will re-create the helper.
 
 ---
 
