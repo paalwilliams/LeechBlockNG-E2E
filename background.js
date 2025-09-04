@@ -688,16 +688,11 @@ function checkTab(id, isBeforeNav, isRepeat) {
 					 * @param {string} timestamp 
 					 */
 					formatTimestamp(timestamp) {
-						const d = new Date(timestamp)
+						const date = new Date(timestamp)
+						const d = new Date(date.getTime() + set*60000);
 						const pad = n => String(n).padStart(2, '0');
-						return (
-							d.getFullYear() +
-							'-' + pad(d.getMonth() + 1) +
-							'-' + pad(d.getDate()) +
-							' ' + pad(d.getHours()) +
-							':' + pad(d.getMinutes()) +
-							':' + pad(d.getSeconds())
-						);
+						return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}` 
+
 					}
 
 					/**
@@ -709,7 +704,9 @@ function checkTab(id, isBeforeNav, isRepeat) {
 
 						const dateTime = this.formatTimestamp(timestamp)
 
-						const d = new Date(timestamp)
+						const date = new Date(timestamp)
+						const d = new Date(date.getTime() + set*60000);
+
 
 						return this.makeRequest(`/states/${entityId}`, {method: 'POST', body: JSON.stringify({
 								state: dateTime,
