@@ -88,6 +88,14 @@ const PER_SET_OPTIONS = {
 
 const GENERAL_OPTIONS = {
 	// def: default value, id: form element identifier (see options.html)
+	adguardHomeEnabled: {type: "boolean", def: false, id: "adguardHomeEnabled"},
+	adguardHomeUsername: {type: "string", def: "", id: "adguardHomeUsername"},
+	adguardHomePassword: {type: "string", def: "", id: "adguardHomePassword"},
+	adguardHomeBaseUrl: {type: "string", def: "", id: "adguardHomeBaseUrl"},
+	adguardHomePort: {type: "string", def: "", id: "adguardHomePort"},
+	homeAssistantBaseUrl: {type: "string", def: "", id: "homeAssistantBaseUrl"},
+	homeAssistantPort: {type: "string", def: "", id: "homeAssistantPort"},
+	homeAssistantToken: {type: "string", def: "", id: "homeAssistantToken"},
 	simplified: { type: "boolean", def: true, id: null }, // default: show simplified options
 	numSets: { type: "string", def: "6", id: "numSets" }, // default: 6 block sets
 	sync: { type: "boolean", def: false, id: "syncStorage" }, // default: use local storage

@@ -14,7 +14,7 @@
 	"author": "James Anderson",
 
 	"background": {
-		"scripts": ["common.js", "background.js"]
+		"scripts": ["common.js", "adguard_home_client.js", "home_assistant.js", "background.js"]
 	},
 
 	"browser_specific_settings": {

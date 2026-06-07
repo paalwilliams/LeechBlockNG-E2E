@@ -673,6 +673,39 @@ function checkTab(id, isBeforeNav, isRepeat) {
 			if (!override && doBlock && (!isRepeat || activeBlock)) {
 
 				function applyBlock(keyword) {
+
+					// End-to-end block: push block rules to AdGuard Home and record
+					// the unblock time in Home Assistant (if enabled in options)
+					const unblockTimeStamp = gOptions[`timedata${set}`].at(-1) * 1000;
+
+					const { adguardHomeUsername, adguardHomePassword, adguardHomeBaseUrl, adguardHomePort, adguardHomeEnabled, homeAssistantBaseUrl, homeAssistantPort, homeAssistantToken } = gOptions;
+					if (adguardHomeEnabled) {
+
+						const adguardClient = new AdguardHomeClient({
+							username: adguardHomeUsername,
+							password: adguardHomePassword,
+							baseUrl: adguardHomeBaseUrl,
+							port: adguardHomePort
+						});
+
+						const homeAssistantClient = new HomeAssistantClient({
+							baseUrl: homeAssistantBaseUrl,
+							port: homeAssistantPort,
+							token: homeAssistantToken
+						});
+
+						adguardClient.getFilteringStatus().then((response) => response.json()).then((data) => {
+							// Apply existing rules alongside the new block rules
+							const existingUserRules = data.user_rules || [];
+							const formattedRequestBody = adguardClient.formatRequestBody(existingUserRules, set);
+							return adguardClient.setRules(formattedRequestBody);
+						}).catch(console.error);
+
+						const entityId = `input_datetime.blocklist_${set}`;
+
+						homeAssistantClient.setStateValue(entityId, adguardClient.formatRequestBody([], set), unblockTimeStamp, set).catch(console.error);
+					}
+
 					if (gDiagMode) {
 						log("### BLOCK APPLIED ###");
 						log(`id: ${id}`);
